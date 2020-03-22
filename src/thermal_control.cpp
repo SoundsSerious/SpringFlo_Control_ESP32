@@ -1,6 +1,8 @@
 #include "thermal_control.h"
 #include "analogWrite.h"
 
+bool thermally_ready = false;
+
 float pid_Kf_p = 25.0;
 float pid_Kf_i = 1.0;
 float pid_Kf_d = 0.0;

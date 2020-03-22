@@ -21,10 +21,10 @@ const int I2C_CLK =22;
 //Converted due to tx pin / serial conflict
 //const int I2C_SDA =21;
 
-const int IO_BUTTON_1= 12;
-const int IO_BUTTON_2 =13;
-const int IO_BUTTON_3 =27;
-const int IO_BUTTON_4 =14;
+const int IO_BUTTON_1= 12; //MODE
+const int IO_BUTTON_2 =13; //Not Connected
+const int IO_BUTTON_3 =27; //Action
+const int IO_BUTTON_4 =14; //FEED
 
 //PWM Filter Gains
 #define PWM_MAX 245

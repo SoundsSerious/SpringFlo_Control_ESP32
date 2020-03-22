@@ -7,6 +7,7 @@ extern unsigned long sensor_interval_ms;
 extern unsigned long piston_interval_ms;
 extern unsigned long feed_interval_ms;
 extern unsigned long userinput_interval_ms;
+extern unsigned long wifi_interval_ms;
 
 
 #endif

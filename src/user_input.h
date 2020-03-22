@@ -4,29 +4,24 @@
 
 #include "Arduino.h"
 #include "config.h"
+#include "cs_timing.h"
+#include "common.h"
 
+#include <SimpleButton.h>
 
+using namespace simplebutton;
 
-bool check_pin(int button_num){
-  bool val = (bool) digitalRead(button_num);
-  if (val == true){Serial.print("Button");Serial.print(button_num);Serial.println("Pressed");return true;}
-  return false;
-}
+extern Button* mode_button;
+extern Button* feed_button;
+extern Button* action_button;
 
+extern bool MODE_STATE;
+extern bool FEED_STATE;
+extern bool ACTION_STATE;
 
-void setup_user_input(){
-  pinMode(IO_BUTTON_1,INPUT);
-  pinMode(IO_BUTTON_2,INPUT);
-  pinMode(IO_BUTTON_3,INPUT);
-  pinMode(IO_BUTTON_4,INPUT);
-}
+void setup_user_input();
 
-void check_user_input(){
-  check_pin(IO_BUTTON_1);
-  check_pin(IO_BUTTON_2);
-  check_pin(IO_BUTTON_3);
-  check_pin(IO_BUTTON_4);
-}
+void check_user_input(void * parameter);
 
-
+bool check_pin(int button_num);
 #endif

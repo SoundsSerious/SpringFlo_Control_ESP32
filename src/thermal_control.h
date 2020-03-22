@@ -19,7 +19,7 @@ void update_thermal_control();
 void smasher_control_task(void * parameter);
 void former_control_task(void * parameter);
 
-
+extern bool thermally_ready;
 extern float pid_Kf_p;
 extern float pid_Kf_i;
 extern float pid_Kf_d;
@@ -34,7 +34,7 @@ extern float pid_former_error, pid_former_ei, pid_former_ed;
 extern float current_pwm_former;
 
 
-// initialize the Smasher
+//initialize the Smasher
 extern float Temperature_Goal_Smasher;
 
 //Former Control

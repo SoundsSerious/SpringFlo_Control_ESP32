@@ -62,13 +62,13 @@ void read_thermocouples(void * parameter){
 
   thermocouple_former.begin();
   vTaskDelay(xDelay/2.0);
-  thermocouple_smasher.begin();
-  vTaskDelay(xDelay/2.0);
+  //thermocouple_smasher.begin();
+  //vTaskDelay(xDelay/2.0);
 
   while(1){ // Always Run
     read_former_temp();
     vTaskDelay(xDelay/2.0);
-    read_smasher_temp();
-    vTaskDelay(xDelay/2.0);
+    //read_smasher_temp();
+    //vTaskDelay(xDelay/2.0);
   }
 }
