@@ -37,6 +37,7 @@ void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uin
 void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len);
 
 String add_field(String visible_name, String tag_name);
+String add_input(String visible_name, String tag_name, int defaultvalue);
 String html_doc();
 
 #endif

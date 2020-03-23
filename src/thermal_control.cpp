@@ -3,6 +3,10 @@
 
 bool thermally_ready = false;
 
+int therm_freq = 1000;
+int therm_ledChannel = 1;
+int therm_resolution = 8;
+
 float pid_Kf_p = 25.0;
 float pid_Kf_i = 1.0;
 float pid_Kf_d = 0.0;
@@ -29,12 +33,11 @@ void former_heater_pid(){
 
   if( former_sensor_is_nominal){
     current_pwm_former = (int) max((float)PWM_MIN,min(pid_Kf_p * pid_former_error + pid_Kf_i * pid_former_ei,(float) PWM_MAX));
-    analogWrite(HEATER_PIN_FORMER, current_pwm_former);
   }
   else{
     current_pwm_former = 0;
-    analogWrite(HEATER_PIN_FORMER, current_pwm_former);
   }
+  ledcWrite(therm_ledChannel, current_pwm_former);
 }
 
 void smasher_heater_pid(){
@@ -50,12 +53,11 @@ void smasher_heater_pid(){
 
   if( former_sensor_is_nominal){
     current_pwm_smasher = (int) max((float)PWM_MIN,min(pid_Kf_p * pid_smasher_error + pid_Kf_i * pid_smasher_ei,(float) PWM_MAX));
-    analogWrite(HEATER_PIN_SMASHER, current_pwm_smasher);
   }
   else{
     current_pwm_smasher = 0;
-    analogWrite(HEATER_PIN_SMASHER, current_pwm_smasher);
   }
+  ledcWrite(therm_ledChannel+1, current_pwm_smasher);
 }
 
 void former_control_task(void * parameter){

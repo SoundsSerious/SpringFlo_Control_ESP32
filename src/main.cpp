@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include <WiFi.h>
-#include "analogWrite.h"
+//#include "analogWrite.h"
 
 
 #include "common.h"
@@ -44,14 +44,14 @@ void print_status( void * parameters){
     Serial.print(temperature_former);
     Serial.print(" | ");
 
-    Serial.print(pid_former_error*100.0 /255);
+    Serial.print(pid_former_error);
     Serial.print(" ");
     Serial.print(pid_former_ei*100.0 /255);
     Serial.print(" ");
     Serial.print(current_pwm_former*100.0 /255);
     Serial.print(" | ");
 
-    Serial.print(pid_smasher_error*100.0 /255);
+    Serial.print(pid_smasher_error);
     Serial.print(" ");
     Serial.print(pid_smasher_ei*100.0 /255);
     Serial.print(" ");
@@ -82,13 +82,18 @@ void setup() {
 
   begin_server();
 
-  analogWriteResolution(8);
-  analogWriteFrequency(1000);
+  ledcSetup(therm_ledChannel, therm_freq, therm_resolution);
+  ledcAttachPin(HEATER_PIN_FORMER, therm_ledChannel);
+  ledcSetup(therm_ledChannel+1, therm_freq, therm_resolution);
+  ledcAttachPin(HEATER_PIN_SMASHER, therm_ledChannel+1);
 
   pinMode(STEP_PIN,OUTPUT);
   pinMode(DIR_PIN,OUTPUT);
   pinMode(PNEUMATIC_SOLENOID_PIN,OUTPUT);
   pinMode(EXTRA_GPIO,OUTPUT);
+
+  ledcSetup(step_ledChannel, step_freq, step_resolution);
+  ledcAttachPin(STEP_PIN, step_ledChannel);
 
 
   //Start Sensor Task
@@ -120,29 +125,6 @@ void setup() {
                     4,                /* Priority of the task. */
                     NULL);            /* Task handle. */
 
-  //Start Motion Control Tasks
-  // xTaskCreate(
-  //                     piston_control,          /* Task function. */
-  //                     "Piston Control",        /* String with name of task. */
-  //                     10000,            /* Stack size in bytes. */
-  //                     NULL,             /* Parameter passed as input of the task */
-  //                   2,                /* Priority of the task. */
-  //                     NULL);            /* Task handle. */
-  //
-  // xTaskCreate(
-  //                   feed_control,          /* Task function. */
-  //                   "Feed Control",        /* String with name of task. */
-  //                   10000,            /* Stack size in bytes. */
-  //                   NULL,             /* Parameter passed as input of the task */
-  //                   2,                /* Priority of the task. */
-  //                   NULL);            /* Task handle. */
-
-  // xTaskCreate(     wifi_status_task,          /* Task function. */
-  //                   "Wifi Status Server",        /* String with name of task. */
-  //                   10000,            /* Stack size in bytes. */
-  //                   NULL,             /* Parameter passed as input of the task */
-  //                   6,                /* Priority of the task. */
-  //                   NULL);            /* Task handle. */
 
   xTaskCreate(     check_user_input,          /* Task function. */
                     "Check user input",        /* String with name of task. */
@@ -160,107 +142,30 @@ void setup() {
 
 }
 
-void feed_forward_one_unit(){
-  Serial.println("Feed Forward");
-  digitalWrite(DIR_PIN,HIGH);
-  steps_to_go = steps_per_feed;
-  if (steps_to_go > 0){
-      while(steps_to_go>0){
-        step_state = !step_state;
-        digitalWrite(STEP_PIN,step_state);
-        delay(1);
-        steps_to_go = steps_to_go - 1;
-      }
-  }
-}
-
-void feed_forward_continuous(){
-  Serial.print(">");
-  digitalWrite(DIR_PIN,HIGH);
-  steps_to_go = 10;
-  if (steps_to_go > 0){
-      while(steps_to_go>0){
-        step_state = !step_state;
-        digitalWrite(STEP_PIN,step_state);
-        delay(1);
-        steps_to_go = steps_to_go - 1;
-      }
-  }
-}
-
-void feed_back_continuous(){
-  Serial.print("<");
-  digitalWrite(DIR_PIN,LOW);
-  steps_to_go = 10;
-  if (steps_to_go > 0){
-      while(steps_to_go>0){
-        step_state = !step_state;
-        digitalWrite(STEP_PIN,step_state);
-        delay(1);
-        steps_to_go = steps_to_go - 1;
-      }
-  }
-}
-
-void feed_back_one_unit(){
-  Serial.println("Feed Back");
-  digitalWrite(DIR_PIN,LOW);
-  steps_to_go = steps_per_feed;
-  if (steps_to_go > 0){
-      while(steps_to_go>0){
-        step_state = !step_state;
-        digitalWrite(STEP_PIN,step_state);
-        delay(1);
-        steps_to_go = steps_to_go - 1;
-      }
-  }
-}
-
-void close_piston(){
-  Serial.println("Close");
-  digitalWrite(PNEUMATIC_SOLENOID_PIN,HIGH);
-  delay(100);
-}
-
-void open_piston(){
-  Serial.println("Open");
-  digitalWrite(PNEUMATIC_SOLENOID_PIN,LOW);
-  delay(100);
-}
-
-void cycle_once(){
-    Serial.println("Cycle Once");
-    feed_forward_one_unit();
-    delay(50);
-    //Close
-    close_piston();
-    //Wait
-    delay(CLOSE_TIME);
-    //Open
-    open_piston();
-    //Eject
-    delay(250);
-}
-
-
 
 void loop() {
 
-  if ( (temperature_former > Temperature_Goal_Smasher-5.0) ){
+  //Check Thermals
+  if ( (temperature_former > PROCESS_TEMP-0.5) ){
     thermally_ready = true; }
   else{ thermally_ready = false; }
 
   switch(current_mode){
     case  FEED_BACK:
+      open_piston();
       if ( action_button -> holding() ){ feed_back_continuous(); }
+      else if (action_button -> doubleClicked()){ feed_back_one_unit(); }
+      else{ feed_stop(); }
       break;
     case FEED_FORWARD:
+      open_piston();
       if ( action_button -> holding() ){ feed_forward_continuous();}
+      else if ( action_button -> doubleClicked() ){ feed_forward_one_unit();}
+      else{ feed_stop(); }
       break;
     case IDLE:
-      if (action_button -> holding()){
-        cycle_once();
-      }
+      open_piston();
+      if (action_button -> holding()){ cycle_once(); }
       break;
     case CONTINUOUS:
       if(continous_active){
@@ -282,3 +187,28 @@ void loop() {
 
 
 }
+
+
+//Start Motion Control Tasks
+// xTaskCreate(
+//                     piston_control,          /* Task function. */
+//                     "Piston Control",        /* String with name of task. */
+//                     10000,            /* Stack size in bytes. */
+//                     NULL,             /* Parameter passed as input of the task */
+//                   2,                /* Priority of the task. */
+//                     NULL);            /* Task handle. */
+//
+// xTaskCreate(
+//                   feed_control,          /* Task function. */
+//                   "Feed Control",        /* String with name of task. */
+//                   10000,            /* Stack size in bytes. */
+//                   NULL,             /* Parameter passed as input of the task */
+//                   2,                /* Priority of the task. */
+//                   NULL);            /* Task handle. */
+
+// xTaskCreate(     wifi_status_task,          /* Task function. */
+//                   "Wifi Status Server",        /* String with name of task. */
+//                   10000,            /* Stack size in bytes. */
+//                   NULL,             /* Parameter passed as input of the task */
+//                   6,                /* Priority of the task. */
+//                   NULL);            /* Task handle. */

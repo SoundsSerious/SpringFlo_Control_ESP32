@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "config.h"
+#include "common.h"
 #include "cs_timing.h"
 #include "a4988.h"
 
@@ -30,10 +31,19 @@ extern bool step_state;
 
 extern A4988 stepper;
 
+extern int step_freq;
+extern int step_ledChannel;
+extern int step_resolution;
 
-
-void pison_control(void * parameters );
-
-void feed_control(void * parameters );
+extern void feed_stop();
+extern void feed_forward_one_unit();
+extern void feed_forward_continuous();
+extern void feed_back_continuous();
+extern void feed_back_one_unit();
+extern void close_piston();
+extern void open_piston();
+extern void cycle_once();
+extern void pison_control(void * parameters );
+extern void feed_control(void * parameters );
 
 #endif

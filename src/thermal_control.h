@@ -4,14 +4,13 @@
 #define THERMAL_CONTROL_H
 
 #include "Arduino.h"
-#include "analogWrite.h"
 #include "sensors.h"
 #include "config.h"
 #include "cs_timing.h"
 
-
-const int freq = 5000;
-const int resolution = 8;
+extern int therm_freq;
+extern int therm_ledChannel;
+extern int therm_resolution;
 
 void smasher_heater_pid();
 void former_heater_pid();
@@ -28,11 +27,9 @@ extern float pid_Kf_d;
 extern float Temp_Goal;
 extern float Temperature_Goal_Former;
 
-
 //Former Control
 extern float pid_former_error, pid_former_ei, pid_former_ed;
 extern float current_pwm_former;
-
 
 //initialize the Smasher
 extern float Temperature_Goal_Smasher;
