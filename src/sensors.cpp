@@ -21,13 +21,13 @@ void read_smasher_temp(){
 
   if (isnan(temp_raw_smasher)) {
     smasher_sensor_is_nominal = false;
-    Serial.print("Something wrong with thermocouple: ");
-    Serial.println(thermocouple_former.readError());
+    //Serial.print("Something wrong with thermocouple: ");
+    //Serial.println(thermocouple_former.readError());
   }
   else if(temperature_internal_f==0 && temp_raw_former == 0){
     smasher_sensor_is_nominal = false;
-    Serial.print("Something wrong with thermocouple: ");
-    Serial.println(thermocouple_former.readError());
+    //Serial.print("Something wrong with thermocouple: ");
+    //Serial.println(thermocouple_former.readError());
   }
   else{
     smasher_sensor_is_nominal = true;
@@ -41,13 +41,13 @@ void read_former_temp(){
 
   if (isnan(temp_raw_former)) {
     former_sensor_is_nominal = false;
-    Serial.print("Something wrong with thermocouple: ");
-    Serial.println(thermocouple_former.readError());
+    //Serial.print("Something wrong with thermocouple: ");
+    //Serial.println(thermocouple_former.readError());
   }
   else if(temperature_internal_f==0 && temp_raw_former == 0){
     former_sensor_is_nominal = false;
-    Serial.print("Something wrong with thermocouple: ");
-    Serial.println(thermocouple_former.readError());
+    //Serial.print("Something wrong with thermocouple: ");
+    //Serial.println(thermocouple_former.readError());
   }
   else{
     former_sensor_is_nominal = true;

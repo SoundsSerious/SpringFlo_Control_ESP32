@@ -21,19 +21,22 @@ void print_status( void * parameters){
 
 
     Serial.print("Current Mode: ");
-    Serial.println(current_mode);
+    switch(current_mode){
+        case FEED_BACK:
+          Serial.print("Backwards Feed");
+          break;
+        case FEED_FORWARD:
+          Serial.print("Forward Feed");
+          break;
+        case IDLE:
+          Serial.print("Idle Mode");
+          break;
+        case CONTINUOUS:
+          Serial.print("Continuous Mode");
+          break;
+    }
 
-    Serial.print("MODE: ");
-    Serial.println((int)MODE_STATE);
-
-    Serial.print("FEED: ");
-    Serial.println((int)FEED_STATE);
-
-    Serial.print("ACTION: ");
-    Serial.print(action_button->doubleClicked());
-    Serial.print(action_button->clicked());
-    Serial.println(action_button->holding());
-
+    Serial.print(" |\t");
     Serial.print(Temperature_Goal_Former);
     Serial.print(" ");
     Serial.print(temp_raw_former);
@@ -76,6 +79,8 @@ void print_status( void * parameters){
 
 void setup() {
   Serial.begin(115200);
+
+  begin_server();
 
   analogWriteResolution(8);
   analogWriteFrequency(1000);
@@ -132,12 +137,12 @@ void setup() {
   //                   2,                /* Priority of the task. */
   //                   NULL);            /* Task handle. */
 
-  xTaskCreate(     wifi_status_task,          /* Task function. */
-                    "Wifi Status Server",        /* String with name of task. */
-                    10000,            /* Stack size in bytes. */
-                    NULL,             /* Parameter passed as input of the task */
-                    6,                /* Priority of the task. */
-                    NULL);            /* Task handle. */
+  // xTaskCreate(     wifi_status_task,          /* Task function. */
+  //                   "Wifi Status Server",        /* String with name of task. */
+  //                   10000,            /* Stack size in bytes. */
+  //                   NULL,             /* Parameter passed as input of the task */
+  //                   6,                /* Priority of the task. */
+  //                   NULL);            /* Task handle. */
 
   xTaskCreate(     check_user_input,          /* Task function. */
                     "Check user input",        /* String with name of task. */
