@@ -3,10 +3,13 @@
 
 #include "Arduino.h"
 #include "config.h"
+#include "common.h"
 #include "cs_timing.h"
 #include "a4988.h"
 
 #define MOTOR_STEPS 200
+#define MIN_YIELD_MICROS 50
+#define STEP_LENGTH 120
 
 extern bool do_feeding;
 extern bool piston_closed;
@@ -30,10 +33,21 @@ extern bool step_state;
 
 extern A4988 stepper;
 
+extern int step_freq;
+extern int step_ledChannel;
+extern int step_resolution;
 
-
-void pison_control(void * parameters );
-
-void feed_control(void * parameters );
+extern void feed_stop();
+extern void feed_forward_one_unit();
+extern void feed_forward_continuous();
+extern void feed_back_continuous();
+extern void feed_back_one_unit();
+extern void close_piston();
+extern void open_piston();
+extern void pop_piston();
+extern void cycle_once();
+extern void pison_control(void * parameters );
+extern void feed_control(void * parameters );
+extern void smart_delay_micros(unsigned long delay_us);
 
 #endif

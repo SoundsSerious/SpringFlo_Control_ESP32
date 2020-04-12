@@ -30,8 +30,10 @@ void check_user_input( void *parameters){
   while(1){ // Always Run
     // mode_button -> update();
     // feed_button -> update();
+
     action_button -> update();
 
+    ACTION_STATE = check_pin(IO_BUTTON_3);
     MODE_STATE = check_pin(IO_BUTTON_1);
     FEED_STATE = check_pin(IO_BUTTON_4);
     //Check State Of System
