@@ -1,6 +1,7 @@
 #include "motion_control.h"
 #include "esp_task_wdt.h"
 
+hw_timer_t * timer = NULL;
 
 A4988 stepper(MOTOR_STEPS, DIR_PIN, STEP_PIN);
 
@@ -15,7 +16,7 @@ float feed_circumfrence = feed_diameter * pi;
 float steps_per_rotation = 200;
 
 float distance_per_step = (pi * feed_diameter ) / steps_per_rotation;
-int steps_per_feed = (int) feed_distance  *2.0 / distance_per_step;
+int steps_per_feed = (int) feed_distance * 2.0 / distance_per_step;
 
 float feed_degrees_rotation = 360.0 * (feed_circumfrence / feed_distance);
 
@@ -27,143 +28,105 @@ int step_freq = 700;
 int step_ledChannel = 5;
 int step_resolution = 8;
 
+float meters_fed_while_on;
+float meters_fed_last_hour;
+float current_meters_per_minute;
 
+
+void feed_control(void * parameters ){
+
+    pinMode(STEP_PIN,OUTPUT);
+    pinMode(DIR_PIN,OUTPUT);
+
+    long next_timer_interval;
+    //digitalWrite(DIR_PIN,LOW);
+
+    while(1){ // Always Run
+      //if (stepper.getCurrentState() > stepper.STOPPED){
+      next_timer_interval = stepper.nextAction();
+      //if(next_timer_interval == 0){ stepper.stop(); }
+      //}
+      vTaskDelay(0);
+    }
+}
 
 void feed_stop(){
-  ledcWrite(step_ledChannel, 0);
+  Serial.println("Feed Stop");
+  stepper.stop();
 }
 
 void feed_forward_one_unit(){
   Serial.println("Feed Forward");
-  digitalWrite(DIR_PIN,HIGH);
-  //steps_to_go = steps_per_feed;
-  // if (steps_to_go > 0){
-  //     while(steps_to_go>0){
-  //       step_state = !step_state;
-  //       if (step_state){
-  //         ledcWrite(step_ledChannel, 255);
-  //       }
-  //       else{
-  //         ledcWrite(step_ledChannel, 0);
-  //       }
-  //       delay(1);
-  //       steps_to_go = steps_to_go - 1;
-  //     }
-  // }
-  ledcWrite(step_ledChannel, 127);
-  delay(FEED_TIME);
-  feed_stop();
+  //if (stepper.getCurrentState() == stepper.STOPPED){
+  stepper.move(STEP_LENGTH);
+  //}
 }
 
 void feed_forward_continuous(){
   Serial.print(">");
-  digitalWrite(DIR_PIN,HIGH);
-  ledcWrite(step_ledChannel, 127);
+  //if (stepper.getCurrentState() == stepper.STOPPED){
+  stepper.move(STEP_LENGTH/10);
+  //}
 }
 
 void feed_back_continuous(){
   Serial.print("<");
-  digitalWrite(DIR_PIN,LOW);
-  ledcWrite(step_ledChannel, 127);
+  //if (stepper.getCurrentState() == stepper.STOPPED){
+  stepper.move(-STEP_LENGTH/10);
+  //}
 }
 
 void feed_back_one_unit(){
   Serial.println("Feed Back");
-  digitalWrite(DIR_PIN,LOW);
-  // steps_to_go = steps_per_feed;
-  // if (steps_to_go > 0){
-  //     while(steps_to_go>0){
-  //       step_state = !step_state;
-  //       if (step_state){
-  //         ledcWrite(step_ledChannel, 255);
-  //       }
-  //       else{
-  //         ledcWrite(step_ledChannel, 0);
-  //       }
-  //       delay(1);
-  //       steps_to_go = steps_to_go - 1;
-  //     }
-  // }
-  ledcWrite(step_ledChannel, 127);
-  delay(FEED_TIME);
-  feed_stop();
+  //if (stepper.getCurrentState() == stepper.STOPPED){
+  stepper.move(-STEP_LENGTH);
+  //}
+
 }
 
 void close_piston(){
   Serial.println("Close");
   digitalWrite(PNEUMATIC_SOLENOID_PIN,HIGH);
-  delay(PISTON_TIME);
+  vTaskDelay((TickType_t) PISTON_TIME / portTICK_PERIOD_MS);
+  piston_closed = true;
 }
 
 void open_piston(){
   Serial.println("Open");
   digitalWrite(PNEUMATIC_SOLENOID_PIN,LOW);
-  delay(PISTON_TIME);
+  vTaskDelay((TickType_t) PISTON_TIME / portTICK_PERIOD_MS);
+  piston_closed = false;
+}
+
+void pop_pison(){
+  Serial.println("Open");
+  digitalWrite(PNEUMATIC_SOLENOID_PIN,LOW);
+  vTaskDelay((TickType_t) DELAY_TIME / portTICK_PERIOD_MS);
+  piston_closed = false;
 }
 
 void cycle_once(){
     Serial.println("Cycle Once");
+
+    unsigned long cycle_start = micros();
+
+    pop_pison();
+
     feed_forward_one_unit();
-    delay(DELAY_TIME);
+    vTaskDelay((TickType_t) FEED_TIME / portTICK_PERIOD_MS);
     //Close
     close_piston();
     //Wait
-    delay(CLOSE_TIME);
+    vTaskDelay((TickType_t) CLOSE_TIME / portTICK_PERIOD_MS);
+    //smart_delay_micros((uint32_t) CLOSE_TIME*1000);
     //Open
     open_piston();
     //Eject
-    delay(EJECT_TIME);
+    vTaskDelay((TickType_t) EJECT_TIME / portTICK_PERIOD_MS);
+    //smart_delay_micros((uint32_t) EJECT_TIME*1000);
+    unsigned long cycle_end = micros();
+
+    //Well use the average of this time, and the last time in a rolling low_pass filter
+    instantnious_cycle_time = 0.5 * (cycle_end - cycle_start)/one_second + instantnious_cycle_time * 0.5;
+    cumulative_cycles += 1;
 }
-
-
-// void piston_control(void * parameters ){
-//     const TickType_t xDelay = piston_interval_ms / portTICK_PERIOD_MS;
-//
-//     pinMode(PNEUMATIC_SOLENOID_PIN,OUTPUT);
-//
-//     while(1){ // Always Run
-//
-//        if (piston_closed){
-//
-//          digitalWrite(PNEUMATIC_SOLENOID_PIN,HIGH);
-//
-//        }
-//        else{
-//
-//          digitalWrite(PNEUMATIC_SOLENOID_PIN,LOW);
-//
-//        }
-//
-//
-//       vTaskDelay(xDelay);
-//     }
-// }
-//
-// void feed_control(void * parameters ){
-//
-//     pinMode(STEP_PIN,OUTPUT);
-//     pinMode(DIR_PIN,OUTPUT);
-//
-//     //stepper.begin(1,10);
-//
-//     //digitalWrite(DIR_PIN,LOW);
-//
-//     while(1){ // Always Run
-//     //
-//     //   if (do_feeding){ //IMplement A4988 driver using async principals.
-//     //     steps_to_go = steps_per_feed;
-//     //     esp_task_wdt_reset();
-//     //     if (steps_to_go > 0){
-//     //         while(steps_to_go>0){
-//     //           esp_task_wdt_reset();
-//     //           step_state != step_state;
-//     //           digitalWrite(STEP_PIN,step_state);
-//     //           steps_to_go = steps_to_go - 1;
-//     //           //vTaskDelay(xDelay);
-//     //         }
-//     //     }
-//     //     do_feeding = false;
-//     //     esp_task_wdt_reset();
-//     //   }
-//     }
-// }

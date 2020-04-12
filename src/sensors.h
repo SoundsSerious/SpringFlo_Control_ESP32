@@ -3,10 +3,10 @@
 
 #include "config.h"
 #include "cs_timing.h"
-
+#include "common.h"
 
 //Sensor Qualith Booleans
-extern bool smasher_sensor_is_nominal;
+extern bool former_last_sensor_status;
 extern bool former_sensor_is_nominal;
 
 
@@ -21,6 +21,10 @@ extern Adafruit_MAX31855 thermocouple_former;
 
 //extern SimpleKalmanFilter smasher_temp_filter;
 extern SimpleKalmanFilter former_temp_filter;
+
+extern unsigned long fail_time_allowed;// = 5 * one_second;//seconds
+extern unsigned long fail_time_begin;// = 0.0 //seconds
+extern bool heat_on; // = false
 
 void read_smasher_temp();
 void read_former_temp();

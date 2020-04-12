@@ -8,6 +8,8 @@
 #include "a4988.h"
 
 #define MOTOR_STEPS 200
+#define MIN_YIELD_MICROS 50
+#define STEP_LENGTH 120
 
 extern bool do_feeding;
 extern bool piston_closed;
@@ -42,8 +44,10 @@ extern void feed_back_continuous();
 extern void feed_back_one_unit();
 extern void close_piston();
 extern void open_piston();
+extern void pop_piston();
 extern void cycle_once();
 extern void pison_control(void * parameters );
 extern void feed_control(void * parameters );
+extern void smart_delay_micros(unsigned long delay_us);
 
 #endif

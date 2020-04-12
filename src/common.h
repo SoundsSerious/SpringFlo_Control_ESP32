@@ -11,12 +11,30 @@ extern int EJECT_TIME;
 extern int PISTON_TIME;
 extern int DELAY_TIME;
 
+extern int MOTOR_RPM;
+extern int MOTOR_ACL;
+extern int MOTOR_DCL;
+
+extern float K_P;
+extern float K_I;
+
+extern float temp_past_minute;
+extern bool last_thermally_active_state;
+
+extern float instantnious_cycle_time;
+extern float instantnious_production_rate;
+extern float past_hour_production_rate;
+extern unsigned long cumulative_cycles;
+
 enum ACTION_MODES {FEED_BACK,FEED_FORWARD,IDLE,CONTINUOUS};
 extern enum ACTION_MODES current_mode;
 
 extern String current_mode_name( ACTION_MODES mode);
 
 extern bool continous_active;
+
+extern unsigned long one_second;// = 1000000; //microseconds
+extern unsigned long one_minute;// = one_second*5; //microseconds
 
 #endif
 

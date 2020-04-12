@@ -7,6 +7,7 @@
 #include "sensors.h"
 #include "config.h"
 #include "cs_timing.h"
+#include "common.h"
 
 extern int therm_freq;
 extern int therm_ledChannel;
@@ -19,9 +20,9 @@ void smasher_control_task(void * parameter);
 void former_control_task(void * parameter);
 
 extern bool thermally_ready;
-extern float pid_Kf_p;
-extern float pid_Kf_i;
-extern float pid_Kf_d;
+// extern float pid_Kf_p;
+// extern float pid_Kf_i;
+// extern float pid_Kf_d;
 
 // initialize the Former
 extern float Temp_Goal;
