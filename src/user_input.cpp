@@ -25,17 +25,24 @@ void check_user_input( void *parameters){
 
   setup_user_input();
 
+  portMUX_TYPE myMutex = portMUX_INITIALIZER_UNLOCKED;
+
+
   const TickType_t xDelay = userinput_interval_ms / portTICK_PERIOD_MS;
 
-  while(1){ // Always Run
+  for(;;){ // Always Run
     // mode_button -> update();
     // feed_button -> update();
 
+    portENTER_CRITICAL(&myMutex);
+    //critical section
     action_button -> update();
-
     ACTION_STATE = check_pin(IO_BUTTON_3);
     MODE_STATE = check_pin(IO_BUTTON_1);
     FEED_STATE = check_pin(IO_BUTTON_4);
+    portEXIT_CRITICAL(&myMutex);
+
+
     //Check State Of System
     if(MODE_STATE){ //We're High this is the operational mode
       if(FEED_STATE){
@@ -57,6 +64,7 @@ void check_user_input( void *parameters){
 
     vTaskDelay(xDelay);
   }
+  vTaskDelete( NULL );
 }
 
 bool check_pin(int button_num){

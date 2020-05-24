@@ -23,6 +23,9 @@
 
 extern String header;
 
+extern const char* ssid;
+extern const char* password;
+
 void begin_server();
 void print_thermal_status_wifi();
 void wifi_status_task(void * parameter);
@@ -38,6 +41,7 @@ void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventTyp
 
 String add_field(String visible_name, String tag_name);
 String add_input(String visible_name, String tag_name, int defaultvalue);
+String add_input(String visible_name, String tag_name, float defaultvalue);
 String html_doc();
 
 #endif

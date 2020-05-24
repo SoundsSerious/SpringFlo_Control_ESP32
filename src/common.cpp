@@ -1,21 +1,23 @@
 #include "common.h"
 
 
-int CLOSE_TIME = 750; //ms//Should be between 0.3-3 seconds
+int CLOSE_TIME = 350; //ms//Should be between 0.3-3 seconds
 int PROCESS_TEMP = 130; //C
 int FEED_TIME = 10; //ms
 int EJECT_TIME = 100;
-int PISTON_TIME = 50;
-int DELAY_TIME = 10;
+int PISTON_TIME = 25;
+int DELAY_TIME = 20;
 
-int MOTOR_RPM = 110;
-int MOTOR_ACL = 1000;
-int MOTOR_DCL = 5000;
+int MOTOR_RPM = 300;
+int MOTOR_ACL = 20000;
+int MOTOR_DCL = 20000;
 
-float K_P = 150.0;
-float K_I = 1.0;
+float K_P = 50.0;
+float K_I = 0.05;
 
 ACTION_MODES current_mode = FEED_BACK;
+
+int MAX_TEMP = 150;
 
 bool continous_active = false;
 
@@ -48,3 +50,14 @@ String current_mode_name( ACTION_MODES mode){
     }
     return name;
 };
+
+void feedTheDog(){
+  // feed dog 0
+  TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE; // write enable
+  TIMERG0.wdt_feed=1;                       // feed dog
+  TIMERG0.wdt_wprotect=0;                   // write protect
+  // feed dog 1
+  TIMERG1.wdt_wprotect=TIMG_WDT_WKEY_VALUE; // write enable
+  TIMERG1.wdt_feed=1;                       // feed dog
+  TIMERG1.wdt_wprotect=0;                   // write protect
+}

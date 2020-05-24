@@ -27,7 +27,7 @@ const int IO_BUTTON_3 =27; //Action
 const int IO_BUTTON_4 =14; //FEED
 
 //PWM Filter Gains
-#define PWM_MAX 245
+#define PWM_MAX 252
 #define PWM_MIN 0
 
 #endif

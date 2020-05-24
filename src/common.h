@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include "soc/timer_group_struct.h"
+#include "soc/timer_group_reg.h"
 
 #ifndef COMMON_H
 #define COMMON_H
@@ -18,6 +20,8 @@ extern int MOTOR_DCL;
 extern float K_P;
 extern float K_I;
 
+extern int MAX_TEMP;
+
 extern float temp_past_minute;
 extern bool last_thermally_active_state;
 
@@ -35,6 +39,8 @@ extern bool continous_active;
 
 extern unsigned long one_second;// = 1000000; //microseconds
 extern unsigned long one_minute;// = one_second*5; //microseconds
+
+extern void feedTheDog();
 
 #endif
 

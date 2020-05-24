@@ -39,5 +39,6 @@ extern float Temperature_Goal_Smasher;
 extern float pid_smasher_error, pid_smasher_ei, pid_smasher_ed;
 extern float current_pwm_smasher;
 
+extern int smasher_pwm_bias;
 
 #endif

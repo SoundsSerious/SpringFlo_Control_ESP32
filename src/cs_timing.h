@@ -9,5 +9,7 @@ extern unsigned long feed_interval_ms;
 extern unsigned long userinput_interval_ms;
 extern unsigned long wifi_interval_ms;
 
+extern unsigned long control_loop_ms;
+
 
 #endif

@@ -26,6 +26,8 @@ extern unsigned long fail_time_allowed;// = 5 * one_second;//seconds
 extern unsigned long fail_time_begin;// = 0.0 //seconds
 extern bool heat_on; // = false
 
+extern String failure_message;
+
 void read_smasher_temp();
 void read_former_temp();
 void read_thermocouples(void * parameter);
